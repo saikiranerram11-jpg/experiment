@@ -1,0 +1,364 @@
+@import "tailwindcss";
+
+/* =========================================================
+   BASE & SMOOTH SCROLLING
+   ========================================================= */
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: #ffffff;
+  background-color: #030712;
+  overflow-x: hidden;
+}
+
+/* =========================================================
+   HERO LOGO 3D STAGE & CONTINUOUS ROTATION
+   ========================================================= */
+
+.hero-logo-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* Fluid, adaptive width across all breakpoints */
+  width: clamp(220px, 46vw, 420px);
+  max-width: 90%;
+
+  perspective: 1200px;
+  perspective-origin: center center;
+  will-change: transform;
+}
+
+/* Ambient 3D glow aura */
+.hero-logo-glow {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: 125%;
+  height: 125%;
+  transform: translate(-50%, -50%);
+
+  background: radial-gradient(
+    circle at center,
+    rgba(251, 191, 36, 0.40) 0%,
+    rgba(245, 158, 11, 0.25) 35%,
+    rgba(234, 88, 12, 0.12) 55%,
+    transparent 72%
+  );
+  filter: blur(clamp(26px, 5.5vw, 46px));
+  pointer-events: none;
+  z-index: 0;
+
+  animation: hero-glow-pulse 4s ease-in-out infinite alternate;
+}
+
+/* 3D floating and tilting stage */
+.hero-logo-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform-style: preserve-3d;
+  animation: hero-logo-float 5s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Single clean 3D continuous rotating logo */
+.hero-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+
+  filter:
+    saturate(1.35)
+    contrast(1.15)
+    brightness(1.06)
+    drop-shadow(0 14px 28px rgb(0 0 0 / 0.40));
+
+  user-select: none;
+  -webkit-user-drag: none;
+
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+
+  transform-origin: center center;
+  animation: hero-logo-spin-3d 8s linear infinite;
+  will-change: transform;
+}
+
+/* Dynamic 3D contact shadow on ground */
+.hero-logo-shadow {
+  width: 72%;
+  height: clamp(16px, 3.5vw, 26px);
+  margin-top: clamp(12px, 2.5vw, 20px);
+
+  background: radial-gradient(
+    ellipse at center,
+    rgb(0 0 0 / 0.60) 0%,
+    rgba(245, 158, 11, 0.22) 40%,
+    transparent 72%
+  );
+  border-radius: 50%;
+  filter: blur(clamp(6px, 1.5vw, 10px));
+
+  animation: hero-shadow-pulse 5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* =========================================================
+   KEYFRAMES: CONTINUOUS 3D ROTATION & ORGANIC MOTION
+   ========================================================= */
+
+/* Continuous uninterrupted 360-degree rotation */
+@keyframes hero-logo-spin-3d {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(360deg);
+  }
+}
+
+/* Organic 3D floating and subtle gyroscopic tilt */
+@keyframes hero-logo-float {
+  0% {
+    transform: translateY(-10px) rotateX(8deg) rotateZ(-2deg);
+  }
+  50% {
+    transform: translateY(2px) rotateX(2deg) rotateZ(1deg);
+  }
+  100% {
+    transform: translateY(12px) rotateX(-7deg) rotateZ(2deg);
+  }
+}
+
+/* Ambient glow breathing */
+@keyframes hero-glow-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.92);
+    opacity: 0.60;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.15);
+    opacity: 0.95;
+  }
+}
+
+/* Ground shadow pulse */
+@keyframes hero-shadow-pulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.30;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0.65;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================= */
+
+/* Tablet (Medium screens: 640px to 1023px) */
+@media (max-width: 1023px) {
+  .hero-logo-wrapper {
+    width: clamp(220px, 52vw, 360px);
+  }
+}
+
+/* Mobile (Small screens: < 640px) */
+@media (max-width: 639px) {
+  .hero-logo-wrapper {
+    width: clamp(190px, 65vw, 290px);
+  }
+
+  .hero-logo {
+    max-height: 290px;
+  }
+}
+
+/* Very compact mobile screens (< 360px) */
+@media (max-width: 359px) {
+  .hero-logo-wrapper {
+    width: clamp(160px, 78vw, 230px);
+  }
+
+  .hero-logo {
+    max-height: 230px;
+  }
+}
+
+/* Mobile Landscape orientation optimization */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hero-logo-wrapper {
+    width: clamp(130px, 32vh, 190px);
+  }
+
+  .hero-logo {
+    max-height: 190px;
+  }
+
+  .hero-logo-shadow {
+    margin-top: 6px;
+    height: 12px;
+  }
+}
+
+/* =========================================================
+   GLASSMORPHISM, SPRING TRANSITIONS & LIGHTING UTILITIES
+   ========================================================= */
+
+:root {
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.glass-card {
+  background: rgba(8, 12, 24, 0.65);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(251, 191, 36, 0.12);
+  transition: transform 0.35s var(--ease-spring),
+              border-color 0.25s ease,
+              box-shadow 0.35s var(--ease-spring),
+              background 0.3s ease;
+}
+
+.glass-card:hover {
+  background: rgba(12, 17, 34, 0.85);
+  border-color: rgba(251, 191, 36, 0.35);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.70), 0 0 30px -4px rgba(245, 158, 11, 0.18);
+}
+
+.glass-card-interactive {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card-interactive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(251, 191, 36, 0.08),
+    transparent
+  );
+  transition: left 0.85s var(--ease-spring);
+  pointer-events: none;
+}
+
+.glass-card-interactive:hover::before {
+  left: 100%;
+}
+
+/* Living golden sheen on headline gradients */
+@keyframes headline-shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.headline-shimmer {
+  background: linear-gradient(
+    90deg,
+    #fef3c7 0%,
+    #fde047 20%,
+    #fbbf24 45%,
+    #f97316 70%,
+    #fde047 88%,
+    #fef3c7 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: headline-shimmer 8s ease-in-out infinite;
+}
+
+/* Animated flow pulse for pipeline connectors in How It Works */
+@keyframes connector-flow {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.connector-pulse-line {
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0.12) 0%,
+    rgba(251, 191, 36, 0.75) 50%,
+    rgba(245, 158, 11, 0.12) 100%
+  );
+  background-size: 200% 100%;
+  animation: connector-flow 3.5s linear infinite;
+}
+
+/* Ambient floating light orbs for subtle background depth */
+@keyframes ambient-orb-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(30px, -35px, 0) scale(1.10);
+  }
+}
+
+.ambient-orb-1 {
+  animation: ambient-orb-float 16s ease-in-out infinite alternate;
+}
+
+.ambient-orb-2 {
+  animation: ambient-orb-float 22s ease-in-out infinite alternate-reverse;
+}
+
+/* =========================================================
+   ACCESSIBILITY & REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-logo,
+  .hero-logo-stage,
+  .hero-logo-glow,
+  .hero-logo-shadow {
+    animation: none !important;
+  }
+}
