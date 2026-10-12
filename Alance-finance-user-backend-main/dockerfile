@@ -1,17 +1,22 @@
-FROM node:22-alpine
+
+FROM node:22-bookworm-slim
 
 WORKDIR /app
 
+# Install dependencies, including tsx and TypeScript used by the current scripts.
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
+# Copy the backend source and TypeScript configuration.
 COPY . .
 
+# Compile TypeScript. Fails the image build if compilation fails.
 RUN npm run build
-RUN npm prune --omit=dev
 
-ENV NODE_ENV=production
+# Do not run as root.
+USER node
 
-EXPOSE 3000
+EXPOSE 3001
 
+# Compose overrides this command for each workload.
 CMD ["npm", "start"]
