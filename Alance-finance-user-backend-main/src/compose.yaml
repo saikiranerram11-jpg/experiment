@@ -1,0 +1,66 @@
+
+services:
+  api:
+    build: .
+    image: alance-finance-backend:local
+    command: ["npm", "start"]
+    env_file:
+      - /etc/alance-finance/common.env
+      - /etc/alance-finance/api.env
+    ports:
+      - "127.0.0.1:3001:3001"
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  reward-worker:
+    image: alance-finance-backend:local
+    command: ["npm", "run", "reward:worker"]
+    env_file:
+      - /etc/alance-finance/common.env
+      - /etc/alance-finance/worker.env
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  dao-revenue-executor:
+    image: alance-finance-backend:local
+    command: ["npm", "run", "dao-revenue:executor"]
+    env_file:
+      - /etc/alance-finance/common.env
+      - /etc/alance-finance/dao-executor.env
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 60s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  dao-revenue-authorize:
+    image: alance-finance-backend:local
+    profiles: ["jobs"]
+    command: ["npm", "run", "dao-revenue:authorize"]
+    env_file:
+      - /etc/alance-finance/common.env
+      - /etc/alance-finance/authorizer.env
+    init: true
+    restart: "no"
+
+  settlement-execute:
+    image: alance-finance-backend:local
+    profiles: ["jobs"]
+    command: ["npm", "run", "settlement:execute"]
+    env_file:
+      - /etc/alance-finance/common.env
+      - /etc/alance-finance/settlement.env
+    init: true
+    restart: "no"
