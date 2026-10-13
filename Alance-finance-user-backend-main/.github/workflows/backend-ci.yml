@@ -1,0 +1,39 @@
+name: Backend Docker CI
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'Alance-finance-user-backend-main/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [master]
+    paths:
+      - 'Alance-finance-user-backend-main/**'
+      - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    name: Build and validate backend image
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Alance-finance-user-backend-main
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        run: docker build -f dockerfile -t alance-finance-backend:ci .
+
+      - name: Verify Node.js runtime
+        run: docker run --rm --entrypoint node alance-finance-backend:ci --version
+
+      - name: Verify compiled backend
+        run: docker run --rm --entrypoint sh alance-finance-backend:ci -c "test -f /app/dist/index.js && echo 'Backend build files found' "
