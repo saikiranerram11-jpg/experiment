@@ -1,4 +1,4 @@
-name: Backend Docker CI
+﻿name: Backend Docker CI
 
 on:
   push:
@@ -13,9 +13,13 @@ on:
       - '.github/workflows/backend-ci.yml'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   docker-build:
-    name: Build and validate backend image
+    name: Build and push backend image
     runs-on: ubuntu-latest
 
     defaults:
@@ -36,4 +40,28 @@ jobs:
         run: docker run --rm --entrypoint node alance-finance-backend:ci --version
 
       - name: Verify compiled backend
-        run: docker run --rm --entrypoint sh alance-finance-backend:ci -c "test -f /app/dist/index.js && echo 'Backend build files found' "
+        run: docker run --rm --entrypoint sh alance-finance-backend:ci -c "test -f /app/dist/index.js && echo 'Backend build files found'"
+
+      - name: Configure AWS credentials
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.event_name != 'pull_request'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag and push image to ECR
+        if: github.event_name != 'pull_request'
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.ECR_REPOSITORY }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag alance-finance-backend:ci "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker tag alance-finance-backend:ci "$REGISTRY/$REPOSITORY:latest"
+          docker push "$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          docker push "$REGISTRY/$REPOSITORY:latest"
